@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Editor</title>
+
+    <!--[if lt IE 9]>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/excanvas.js"></script>
+    <![endif]-->
+
+    <!--[if lte IE 9]>
+      <script type="text/javascript" src="js/lib/blob.min.js"></script>
+    <![endif]-->
+
+    <!-- Material Design -->
+    <link rel="stylesheet" type="text/css" href="css/lib/normalize.css">
+    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
+    <link rel="stylesheet" href="css/lib/material.min.css">
+
+    <!-- Third Party -->
+    <link rel="stylesheet" type="text/css" href="css/lib/spectrum.css">
+    <link rel="stylesheet" type="text/css" href="css/lib/jquery.contextMenu.min.css">
+    <link rel="stylesheet" type="text/css" href="css/lib/tooltipster.css">
+    <link rel="stylesheet" type="text/css" href="css/lib/rrssb.css">
+
+    <!-- My CSS -->
+    <link rel="stylesheet" type="text/css" href="css/editor.css">
+
+  </head>
+  <body>
+
+    <div id="preview" class="noshow">
+      <img src="/images/tshirt.png" id="preview-image">
+    </div>
+
+    <div id="sidebar" class="noselect">
+
+      <div id="sidebar-artwork" class="sidebar-item">
+        <span class="inactive"><img class="sidebar-img" src="images/sidebar/artwork.png"></span>
+        <span class="active noshow"><img class="sidebar-img" src="images/sidebar/artwork.png"></span>
+        <br/>
+        Search Artwork
+      </div><!-- /sidebar-item -->
+
+      <div id="sidebar-export" class="sidebar-item">
+        <span class="inactive"><img class="sidebar-img" src="images/sidebar/export.png"></span>
+        <span class="active noshow"><img class="sidebar-img" src="images/sidebar/export.png"></span>
+        <br/>
+        Share
+      </div><!-- /sidebar-item -->
+
+    </div><!-- /sidebar -->
+
+    <div class="mdl-layout mdl-js-layout">
+      <div id="drawer" class="mdl-layout__drawer">
+        <nav class="mdl-navigation">
+          <div id="artwork-panel" class="slideout-body noselect">
+            <span class="mdl-layout-title">Artwork</span>
+            <form id="artwork-search-form" name="artwork-search-form" autocomplete="off">
+              <div id="left">
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                  <input class="mdl-textfield__input" type="text" id="artwork-search">
+                  <label class="mdl-textfield__label" for="artwork-search">Search</label>
+                </div>
+              </div>
+              <div id="right">
+                <i id="search-submit" class="material-icons">search</i>
+              </div>
+            </form>
+
+            <div id="search-type-block" style="visibility: hidden;">
+              <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="icons">
+                <input type="radio" id="icons" class="mdl-radio__button" name="search-type" value="icons">
+                <span class="mdl-radio__label">Icons</span>
+              </label>
+              <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="clipart" id="clipart-label">
+                <input type="radio" id="clipart" class="mdl-radio__button" name="search-type" value="clipart" checked>
+                <span class="mdl-radio__label">Clipart</span>
+              </label>
+            </div><!-- /search-type-block -->
+
+            <div class="search-results">
+              <div id="artwork-spinner" class="noshow">
+                <div class="mdl-spinner mdl-js-spinner is-active"></div>
+              </div>
+              <span id="no-results" class="noshow">No results found.</span>
+            </div><!-- /search-results -->
+          </div><!-- /artwork-panel -->
+
+          <div id="export-panel" class="slideout-body noselect">
+            <span class="mdl-layout-title">Download Image File</span>
+
+            <div class="export-options">
+              <p>Download an image file for use in other programs.</p>
+
+              <div class="file-options">
+                <p><strong>File Type</strong></p>
+                <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="png">
+                  <input type="radio" id="png" class="mdl-radio__button" name="file-type" value="png" checked>
+                  <span class="mdl-radio__label">PNG</span>
+                </label>
+                <br/>
+                <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="svg">
+                  <input type="radio" id="svg" class="mdl-radio__button" name="file-type" value="svg">
+                  <span class="mdl-radio__label">SVG</span>
+                </label>
+                <br/>
+                <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="jpeg">
+                  <input type="radio" id="jpeg" class="mdl-radio__button" name="file-type" value="jpeg">
+                  <span class="mdl-radio__label">JPEG</span>
+                </label>
+              </div>
+              <div class="file-options">
+                <p><strong>Background Color</strong></p>
+                <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="transparent">
+                  <input type="radio" id="transparent" class="mdl-radio__button" name="background-color" value="transparent" checked>
+                  <span class="mdl-radio__label">Transparent</span>
+                </label>
+                <br/>
+                <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="white">
+                  <input type="radio" id="white" class="mdl-radio__button" name="background-color" value="white">
+                  <span class="mdl-radio__label">White</span>
+                </label>
+              </div>
+
+              <br/><br/>
+
+              <div class="export-button-set">
+                <button id="download-image-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--colored export-button">Download Image</button>
+              </div><!-- /export-button-set -->
+            </div><!-- /export-options -->
+
+            <br/><br/>
+            <span class="mdl-layout-title">Import or Export</span>
+
+            <div class="export-options">
+              <p>Save your work for later, or continue where you left off.</p>
+              <br/>
+
+              <div class="export-button-set">
+                <div class="export-import-buttons">
+                  <form id="import-wrapper">
+                    <input type="file" id="import-file-button" accept='.logo' class="noshow">
+                    <label for="import-file-button" id="file-picker-label" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--colored export-button">
+                      Import File
+                    </label>
+                  </form>
+                </div>
+
+                <div class="export-import-buttons">
+                  <button id="export-file-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--colored export-button">
+                    Export File
+                  </button>
+                </div>
+              </div><!-- /export-button-set -->
+            </div><!-- /export-options -->
+          </div><!-- /export-pane; -->
+        </nav>
+      </div> <!-- /drawer -->
+
+      <main class="mdl-layout__content">
+        <div class="container">
+
+          <div id="toolbar">
+
+            <div id="toolbar-undo" class="toolbar-item"></div>
+            <div class="mdl-tooltip mdl-tooltip--large noselect" for="toolbar-undo">Undo</div>
+
+            <div id="toolbar-redo" class="toolbar-item"></div>
+            <div class="mdl-tooltip mdl-tooltip--large noselect" for="toolbar-redo">Redo</div>
+
+            <div class="toolbar-separator"></div>
+
+            <div id="toolbar-text" class="toolbar-item"></div>
+            <div class="mdl-tooltip mdl-tooltip--large noselect" for="toolbar-text">Insert Text</div>
+
+            <div id="toolbar-shape" class="toolbar-item toolbar-dropdown">
+              <div class="toolbar-arrow"></div>
+
+              <div class="toolbar-submenu noselect noshow">
+                <div class="submenu-item" id="shapes-line">
+                  <img src="images/toolbar/line.png" class="submenu-icon">
+                  Line
+                </div>
+                <div class="submenu-item" id="shapes-circle">
+                  <img src="images/toolbar/circle.png" class="submenu-icon">
+                  Circle
+                </div>
+                <div class="submenu-item" id="shapes-rectangle">
+                  <img src="images/toolbar/rectangle.png" class="submenu-icon">
+                  Rectangle
+                </div>
+                <div class="submenu-item" id="shapes-rounded">
+                  <img src="images/toolbar/rounded-rectangle.png" class="submenu-icon">
+                  Rounded Rectangle
+                </div>
+              </div><!-- /toolbar-submenu -->
+
+            </div><!-- /toolbar-shape -->
+            <div class="mdl-tooltip mdl-tooltip--large noselect" for="toolbar-shape">Insert Shape</div>
+
+            <div class="toolbar-separator"></div>
+
+            <div id="active-tools" class="noshow">
+              <div class="text shape group svg">
+
+                <div id="toolbar-arrange" class="toolbar-item toolbar-dropdown noselect">
+                  Arrange
+                  <div class="toolbar-arrow"></div>
+
+                  <div class="toolbar-submenu noselect noshow">
+                    <div class="submenu-item" id="toolbar-send-back">
+                      <img src="images/toolbar/send-back.png" class="submenu-icon">
+                      Send to Back
+                    </div>
+                    <div class="submenu-item" id="toolbar-send-backward">
+                      <img src="images/toolbar/send-backward.png" class="submenu-icon">
+                      Send Backward
+                    </div>
+                    <div class="submenu-item" id="toolbar-bring-forward">
+                      <img src="images/toolbar/bring-forward.png" class="submenu-icon">
+                      Bring Forward
+                    </div>
+                    <div class="submenu-item" id="toolbar-bring-front">
+                      <img src="images/toolbar/bring-front.png" class="submenu-icon">
+                      Bring to Front
+                    </div>
+                  </div><!-- /toolbar-submenu -->
+
+                </div><!-- /toolbar-arrange -->
+                <div class="mdl-tooltip mdl-tooltip--large noselect" for="toolbar-arrange">Arrange Objects</div>
+
+                <div class="toolbar-separator"></div>
+
+              </div> <!-- /text shape group svg -->
+
+              <div class="text">
+
+                <!--
+                <div id="toolbar-font-size" class="toolbar-item toolbar-input">
+                  <input type="text" id="font-size" maxlength="3" class="toolbar-text-input">
+                  <div class="toolbar-arrow"></div>
+                </div>
+                <div class="mdl-tooltip mdl-tooltip--large noselect" for="toolbar-font-size">Font Size</div>
+
+                <div class="toolbar-separator"></div>
+                -->
+
+                <div id="toolbar-font-family" class="toolbar-item toolbar-dropdown noselect">
+                  <span id="current-font"></span>
+                  <div class="toolbar-arrow"></div>
+
+                  <div class="toolbar-submenu noselect scrolling noshow">
+                    <div class="submenu-item" id="font-arial">
+                      <span style="font-family: 'Arial'">Arial</span>
+                    </div>
+                  </div><!-- /toolbar-submenu -->
+
+                </div>
+                <div class="mdl-tooltip mdl-tooltip--large noselect" for="toolbar-font-family">Font</div>
+
+                <div class="toolbar-separator"></div>
+
+                <div id="toolbar-bold" class="toolbar-item"></div>
+                <div class="mdl-tooltip mdl-tooltip--large noselect" for="toolbar-bold">Bold</div>
+
+                <div id="toolbar-italics" class="toolbar-item"></div>
+                <div class="mdl-tooltip mdl-tooltip--large noselect" for="toolbar-italics">Italics</div>
+
+                <div id="toolbar-underline" class="toolbar-item"></div>
+                <div class="mdl-tooltip mdl-tooltip--large noselect" for="toolbar-underline">Underline</div>
+
+                <div class="toolbar-separator"></div>
+
+              </div><!-- /text -->
+
+              <div class="text shape svg">
+
+                <div id="toolbar-fill-color" class="toolbar-item toolbar-dropdown">
+                  <div class="toolbar-arrow"></div>
+                </div>
+                <div class="mdl-tooltip mdl-tooltip--large noselect" for="toolbar-fill-color">Fill Color</div>
+
+                <div id="toolbar-outline-color" class="toolbar-item toolbar-dropdown">
+                  <div class="toolbar-arrow"></div>
+                </div>
+                <div class="mdl-tooltip mdl-tooltip--large noselect" for="toolbar-outline-color">Outline Color</div>
+
+                <div id="toolbar-effects" class="toolbar-item toolbar-dropdown">
+                  <div class="toolbar-arrow"></div>
+
+                  <div class="toolbar-submenu noselect noshow no-auto-close" id="shadow-submenu">
+
+                    <!-- Shadow -->
+
+                    <div id="effects-box">
+                      <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="shadow-switch" id="shadow-switch-label">
+                        <input type="checkbox" id="shadow-switch" class="mdl-switch__input">
+                        <span class="mdl-switch__label">Shadow</span>
+                      </label>
+
+                      <div id="shadow-options" class="fx-options">
+                        <span class="effects-form-label">Offset</span> <br/>
+                        <div class="slider-container">
+                          <input class="mdl-slider mdl-js-slider" type="range" min="0" max="100" value="5" tabindex="0" id="shadow-offset-slider">
+                        </div>
+
+                        <span class="effects-form-label">Blur</span> <br/>
+                        <div class="slider-container">
+                          <input class="mdl-slider mdl-js-slider" type="range" min="0" max="100" value="15" tabindex="0" id="shadow-blur-slider">
+                        </div>
+
+                        <span class="effects-form-label">Color</span> <br/>
+                        <input type="text" class="hex-display" id="shadow-color-hex" value="#000000" disabled="disabled">
+                        <input type="text" id="shadow-color-picker">
+
+                      </div>
+
+                      <!-- Glow -->
+
+                      <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="glow-switch" id="glow-switch-label">
+                        <input type="checkbox" id="glow-switch" class="mdl-switch__input">
+                        <span class="mdl-switch__label">Glow</span>
+                      </label>
+
+                      <div id="glow-options" class="fx-options">
+                        <span class="effects-form-label">Size</span> <br/>
+                        <div class="slider-container">
+                          <input class="mdl-slider mdl-js-slider" type="range" min="0" max="100" value="25" tabindex="0" id="glow-size-slider">
+                        </div>
+
+                        <span class="effects-form-label">Color</span> <br/>
+                        <input type="text" class="hex-display" id="glow-color-hex" value="#000000" disabled="disabled">
+                        <input type="text" id="glow-color-picker">
+
+                      </div>
+
+                    </div><!-- /effects-box -->
+
+                  </div>
+
+                </div>
+                <div class="mdl-tooltip mdl-tooltip--large noselect" for="toolbar-effects">Effects</div>
+
+              </div>
+
+              <div class="text shape">
+                <!-- empty -->
+              </div>
+
+              <div class="shape">
+                <!-- empty -->
+              </div>
+
+              <div class="svg">
+                <!-- empty -->
+              </div>
+
+            </div><!-- /active-tools -->
+
+          </div><!-- /toolbar -->
+
+          <div id="content">
+            <div id="canvas-container">
+              <canvas id="c" width="100%" height="10000"></canvas>
+            </div>
+          </div><!-- /content -->
+        </div><!-- /container -->
+
+        <div id="loading-spinner" class="noshow">
+          <div class="mdl-spinner mdl-js-spinner is-active"></div>
+        </div>
+
+        <div id="preview-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--accent floating-button noselect">
+          <img width="15" height="15" src="images/new-window.png"> Preview
+        </div><!-- /preview-button -->
+
+        <div id="download-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--accent floating-button noselect">
+          <img width="20" height="15" src="images/cloud.png"> Download
+        </div><!-- /download-button -->
+
+      </main> <!-- /mdl-layout__content -->
+    </div> <!-- /mdl-layout -->
+
+    <!-- scripts -->
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.0.6/material.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/fabric.js/1.5.0/fabric.min.js"></script>
+    <script type="text/javascript" src="js/bundle.js"></script>
+    <script type="text/javascript" src="js/lib/spectrum.min.js"></script>
+
+    <!-- fonts -->
+    <script>
+      WebFontConfig = {
+        google: {
+          families: ['Actor', 'Amaranth', 'Amatic SC', 'Amiri', 'Antic', 'Anton', 'Arapey', 'Architects Daughter', 'Archivo Black', 'Arimo', 'Audiowide', 'Bad Script', 'Bangers', 'BenchNine', 'Bitter', 'Black Ops One', 'Candal', 'Chewy', 'Cinzel', 'Cookie', 'Covered By Your Grace', 'Damion', 'Dancing Script', 'Droid Serif', 'Enriqueta', 'Exo', 'Francois One', 'Fredoka One', 'Fugaz One', 'Indie Flower', 'Karla', 'Kaushan Script', 'Lato', 'Limelight', 'Lobster', 'Lobster Two', 'Lora', 'Luckiest Guy', 'Molengo', 'Monda', 'Montserrat', 'News Cycle', 'Open Sans', 'Orbitron', 'Oswald', 'Pacifico', 'Passion One', 'Paytone One', 'Permanent Marker', 'Playfair Display SC', 'Poiret One', 'Raleway', 'Roboto', 'Roboto Mono', 'Rock Salt', 'Russo One', 'Satisfy', 'Shadows Into Light', 'Sigmar One', 'Special Elite', 'Ubuntu', 'Varela Round', 'Vidaloka', 'Yanone Kaffeesatz']
+        },
+        fontactive: function(familyName, fvd) {
+          $(window).trigger("fontLoadedEvent", [familyName]);
+        },
+        active: function() {
+          $(window).trigger("allFontsLoadedEvent");
+        }
+      };
+
+      (function(d) {
+        var wf = d.createElement('script'), s = d.scripts[0];
+        wf.src = '//ajax.googleapis.com/ajax/libs/webfont/1.5.18/webfont.js';
+        s.parentNode.insertBefore(wf, s);
+      })(document);
+    </script>
+
+  </body>
+</html>

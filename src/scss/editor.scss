@@ -1,0 +1,19 @@
+/* --- toolbar colors --- */
+$toolbar-height: 36px;
+$toolbar-background: #F2F2F2;
+$toolbar-border: #BDBDBD;
+$toolbar-button-height: 26px;
+
+/* --- sidebar --- */
+$sidebar-width: 80px;
+$sidebar-color: #37375A;
+$sidebar-color-hover: lighten($sidebar-color, 12%);
+$sidebar-color-highlight: #E74C3C;
+
+/* --- preview + download buttons */
+$download-button-color: #E74C3C;
+$preview-button-color: #16A085;
+
+@import 'page';
+@import 'sidebar';
+@import 'toolbar';

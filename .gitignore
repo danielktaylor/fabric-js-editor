@@ -1,0 +1,4 @@
+node_modules
+.DS_Store
+build/
+src/js/app/config.js

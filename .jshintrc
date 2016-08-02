@@ -1,0 +1,7 @@
+{
+  "browserify": true,
+  "jquery": true,
+  "predef": [
+    "fabric"
+  ]
+}
