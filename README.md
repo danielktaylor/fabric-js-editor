@@ -1,6 +1,6 @@
 # Fabric.js Editor
 
-A vector image editor that uses the HTML5 canvas element and [Fabric.js](http://fabricjs.com/)
+A 100% web-based vector image editor that uses the HTML5 canvas element and [Fabric.js](http://fabricjs.com/)
 
 ## Running the code
 
