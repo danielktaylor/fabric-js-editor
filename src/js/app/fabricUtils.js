@@ -102,6 +102,7 @@ function clone() {
   canvas.trigger("object:statechange");
 }
 
+// TODO Fabric.js might do this for us now that we've on version >1.5
 function sendGroupBackward(group, bottom) {
   // Copy object references
   var sorted = group.objects.slice();
@@ -129,6 +130,7 @@ function sendGroupBackward(group, bottom) {
   }
 }
 
+// TODO Fabric.js might do this for us now that we've on version >1.5
 function sendGroupForward(group, top) {
   // Copy object references
   var sorted = group.objects.slice();

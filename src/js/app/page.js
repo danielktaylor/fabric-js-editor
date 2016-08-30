@@ -270,7 +270,7 @@ function outlineColorPicker() {
   $("#toolbar-outline-color").spectrum("container").find(".sp-input").on('keydown', function(evt) {
     var key = evt.keyCode || evt.which;
     if (key === 13) {
-      handleFillColorChangeEvent($(this).val());
+      handleOutlineColorChangeEvent($(this).val());
     }
   });
 }

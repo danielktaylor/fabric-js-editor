@@ -16,5 +16,4 @@ If you run `gulp` without any arguments, you can see a list of the other tasks.
 ## TODO's
 
 * Switch to [gToolbars.js](https://github.com/danielktaylor/gToolbars.js), which is based on this project, for the toolbars
-* Upgrade to newest release of Fabric.js (currently at 1.5)
 * Strip out some remaining code that talks to the (no longer existing) backend server

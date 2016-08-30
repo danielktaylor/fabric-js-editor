@@ -6,9 +6,9 @@ var utils = new (require('./fabricUtils.js'))();
 var drawnObj, isMouseDown;
 
 function disableDraw() {
-  canvas.__eventListeners["mouse:down"] = [];
-  canvas.__eventListeners["mouse:move"] = [];
-  canvas.__eventListeners["mouse:up"] = [];
+  canvas.off('mouse:down');
+  canvas.off('mouse:move');
+  canvas.off('mouse:up');
 
   canvas.selection = true;
   canvas.forEachObject(function(o) {

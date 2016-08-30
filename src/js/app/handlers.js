@@ -13,7 +13,6 @@ var drawing = new (require('./drawing.js'))();
 var text = new (require('./text.js'))();
 var fetchApi = new (require('./fetchApi.js'))();
 var importExport = new (require('./importExport.js'))();
-var sharingButtons = require('rrssb');
 var isAppLoading = true;
 
 // Initialize state
@@ -428,7 +427,7 @@ function listeners() {
     hideActiveTools();
 
     // Cleanup background
-    if (background === 'white') {
+    if (background === 'white' || type === 'jpeg') {
       if (type === 'png' || type === 'jpeg') {
         canvas.setBackgroundColor("");
       } else {
@@ -715,6 +714,9 @@ function HandlersModule() {
     rotatingPointOffset: 30
   });
 
+  // Preserve object layer order when selecting objects
+  canvas.preserveObjectStacking = true;
+
   // Setup handlers
   deleteHandler();
   rightClick();
@@ -746,7 +748,8 @@ function HandlersModule() {
       $("#loading-spinner").addClass("noshow");
     }
 
-    // Show popup tooltip on artwork search
+    // Show popup tooltip on artwork search button when the page loads
+    /*
     $("#sidebar-artwork > .inactive > img").tooltipster({
       theme: 'tooltipster-daring',
       contentAsHTML: true,
@@ -770,25 +773,9 @@ function HandlersModule() {
     window.setTimeout(function() {
       $("#sidebar-artwork > .inactive > img").tooltipster('show');
     }, 400);
+    */
 
   }
-
-  // Social sharing buttons
-  $(".rrssb-buttons a").click(function(e) {
-    e.preventDefault();
-    $("#social-buttons-container").addClass("noshow");
-    $("#uploading-placeholder").removeClass("noshow");
-
-    var url = $(this).attr("data-url");
-    var data = JSON.stringify(canvas);
-    importExport.shareFile(data, function(filename) {
-      popupCenter(url.replace("IMAGEID", filename), "Loading", 580, 470);
-    });
-
-    $("#uploading-placeholder").addClass("noshow");
-    $("#social-buttons-container").removeClass("noshow");
-    return false;
-  });
 
   // Undo redo
   canvas.on("object:modified", function() {
