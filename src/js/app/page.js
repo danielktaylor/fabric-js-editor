@@ -5,7 +5,7 @@ var utils = new (require('./fabricUtils.js'))();
 
 function noBackspace() {
   // Prevent the backspace key from navigating back
-  $(document).unbind('keydown').bind('keydown', function (event) {
+  $(document).off('keydown').on('keydown', function (event) {
     var doPrevent = false;
     if (event.keyCode === 8) {
       var d = event.srcElement || event.target;
@@ -34,7 +34,7 @@ function noBackspace() {
 }
 
 function arrowKeys() {
-  $(document).bind("keydown", function(evt) {
+  $(document).on("keydown", function(evt) {
     // Block the functionality if user is not on canvas
     // This is terrible
     var active = $(document.activeElement);
@@ -139,9 +139,9 @@ function showPreview() {
   design.css({top: top, left: left});
 
   // Set event listener
-  $(document).bind("click.preview", function(event) {
+  $(document).on("click.preview", function(event) {
     preview.addClass("noshow");
-    $(document).unbind("click.preview");
+    $(document).off("click.preview");
   });
 }
 
@@ -191,8 +191,8 @@ function fillColorPicker() {
     }
   });
 
-  $("#toolbar-fill-color").unbind("dragstop.spectrum");
-  $("#toolbar-fill-color").bind("dragstop.spectrum", function(e, color) {
+  $("#toolbar-fill-color").off("dragstop.spectrum");
+  $("#toolbar-fill-color").on("dragstop.spectrum", function(e, color) {
     handleFillColorChangeEvent(color);
     return false;
   });
@@ -261,8 +261,8 @@ function outlineColorPicker() {
     allowEmpty:true
   });
 
-  $("#toolbar-outline-color").unbind("dragstop.spectrum");
-  $("#toolbar-outline-color").bind("dragstop.spectrum", function(e, color) {
+  $("#toolbar-outline-color").off("dragstop.spectrum");
+  $("#toolbar-outline-color").on("dragstop.spectrum", function(e, color) {
     handleOutlineColorChangeEvent(color);
     return false;
   });
@@ -288,8 +288,8 @@ function shadowColorPicker() {
     clickoutFiresChange: false
   });
 
-  $("#shadow-color-picker").unbind("dragstop.spectrum");
-  $("#shadow-color-picker").bind("dragstop.spectrum", function(e, color) {
+  $("#shadow-color-picker").off("dragstop.spectrum");
+  $("#shadow-color-picker").on("dragstop.spectrum", function(e, color) {
     var hex = color.toHexString();
     var rgba = color.toRgbString();
     $("#shadow-color-hex").val(hex);
@@ -316,8 +316,8 @@ function glowColorPicker() {
     clickoutFiresChange: false
   });
 
-  $("#glow-color-picker").unbind("dragstop.spectrum");
-  $("#glow-color-picker").bind("dragstop.spectrum", function(e, color) {
+  $("#glow-color-picker").off("dragstop.spectrum");
+  $("#glow-color-picker").on("dragstop.spectrum", function(e, color) {
     var hex = color.toHexString();
     $("#glow-color-hex").val(hex);
     utils.changeShadowColor(hex);
@@ -343,13 +343,13 @@ function escHandler(e) {
     closePanel(open, true);
 
     // Unregister escape key handler
-    $(document).unbind("keyup", escHandler);
+    $(document).off("keyup", escHandler);
   }
 }
 
 function openPanel(button, animate) {
   // Register escape key handler
-  $(document).keyup(escHandler);
+  $(document).on("keyup", escHandler);
 
   // Change button style
   button.addClass("sidebar-item-selected");
@@ -364,7 +364,7 @@ function openPanel(button, animate) {
   // Open panel
   if (animate) {
     if ($("#drawer.is-visible").length === 0) {
-      $(".mdl-layout__drawer-button").click();
+      $(".mdl-layout__drawer-button").trigger("click");
     }
   }
 
@@ -373,7 +373,7 @@ function openPanel(button, animate) {
   fitArtworkResultsHeight();
 
   // Register click event handler
-  $(document).bind("click.menu", function(event) {
+  $(document).on("click.menu", function(event) {
     if (!( $(event.target).closest($("#drawer")).length )) {
       if ($(event.target)[0].id === "sidebar") {
         closePanel(null, true);
@@ -385,13 +385,13 @@ function openPanel(button, animate) {
 
   // Panel-specific logic
   if (pname === "artwork") {
-    $("#drawer #artwork-search").select();
+    $("#drawer #artwork-search").trigger("select");
   }
 }
 
 function closePanel(button, animate) {
   // Unregister escape key handler
-  $(document).unbind("keyup", escHandler);
+  $(document).off("keyup", escHandler);
 
   // Find open panel
   if (button === null) {
@@ -409,12 +409,12 @@ function closePanel(button, animate) {
   // Close panel
   if (animate === true) {
     if ($("#drawer.is-visible").length === 1) {
-      $(".mdl-layout__drawer-button").click();
+      $(".mdl-layout__drawer-button").trigger("click");
     }
   }
 
   // Unregister click event handler
-  $(document).unbind("click.menu");
+  $(document).off("click.menu");
 }
 
 function closeSubmenu(menu, noTooltips) {

@@ -31,7 +31,7 @@ var state = new (require('./state.js'))(
 
 function deleteHandler() {
   // Handler for the delete and backspace keys
-  $(document).keyup(function(e) {
+  $(document).on("keyup", function(e) {
     if(e.which == 46 || e.which == 8) {
       // Block the functionality if user is entering text
       var active = $(document.activeElement);
@@ -79,7 +79,7 @@ function rightClick() {
   });
 
   // Bind right-click menu
-  $('#content').bind('contextmenu.custom', function (e) {
+  $('#content').on('contextmenu.custom', function (e) {
     var target = canvas.findTarget(e.e);
     if (target !== null && target !== undefined) {
       canvas.setActiveObject(target);
@@ -164,7 +164,7 @@ function showActiveTools() {
 
       /*
       $("#font-size").val(utils.getFontSize());
-      $("#font-size").change(function(value) {
+      $("#font-size").on("change", function(value) {
         utils.setFontSize($("#font-size").val());
       });
       */
@@ -238,7 +238,7 @@ function listeners() {
     $("#toolbar-font-family > .toolbar-submenu").append(str);
 
     var element = $("#" + familyId);
-    element.click(fontClickHandler);
+    element.on("click", fontClickHandler);
   });
 
   $(window).on("allFontsLoadedEvent", function(event, family) {
@@ -256,10 +256,10 @@ function listeners() {
     $("#toolbar-font-family .toolbar-submenu").html(sorted);
 
     // Set new event listeners
-    $("#toolbar-font-family .submenu-item").click(fontClickHandler);
+    $("#toolbar-font-family .submenu-item").on("click", fontClickHandler);
   });
 
-  $("#font-arial").click(function() {
+  $("#font-arial").on("click", function() {
     utils.setFont("Arial");
     showCurrentFont();
     text.returnFocus();
@@ -278,26 +278,26 @@ function listeners() {
   window.addEventListener('resize', fitSearchResults, false);
   fitSearchResults();
 
-  $(".sidebar-item").click(function() {
+  $(".sidebar-item").on("click", function() {
     toggle($(this));
     return false;
-  }).hover(function() {
+  }).on("mouseenter", function() {
     if (!$(this).hasClass("sidebar-item-active")) {
       $(this).addClass("sidebar-item-hover");
     }
-  }, function() {
+  }).on("mouseleave", function() {
     $(this).removeClass("sidebar-item-hover");
   });
 
-  $("#toolbar-undo").click(function() {
+  $("#toolbar-undo").on("click", function() {
     state.undo();
   });
 
-  $("#toolbar-redo").click(function() {
+  $("#toolbar-redo").on("click", function() {
     state.redo();
   });
 
-  $("#toolbar-text").click(function() {
+  $("#toolbar-text").on("click", function() {
     $(document).trigger("click.submenu"); // Make sure all submenus are closed
     if ($("#toolbar-text").hasClass("toolbar-item-active")) {
       $("#toolbar-text").removeClass("toolbar-item-active");
@@ -310,7 +310,7 @@ function listeners() {
 
   // toolbar submenus
   $('.toolbar-dropdown').each(function(i, obj) {
-    $(obj).click(function(event) {
+    $(obj).on("click", function(event) {
       var button = $(this);
       var popup = $(".toolbar-submenu", button);
       var visible = popup.is(":visible");
@@ -324,7 +324,7 @@ function listeners() {
         }
 
         page.closeSubmenu(button);
-        $(document).unbind("click.submenu");
+        $(document).off("click.submenu");
       } else {
         // We're opening the submenu
         $(document).trigger("click.submenu", true);
@@ -337,13 +337,13 @@ function listeners() {
         popup.css({top: x, left: y});
         popup.removeClass("noshow");
 
-        $(document).bind("click.submenu", function(event, noTooltips) {
+        $(document).on("click.submenu", function(event, noTooltips) {
           if (event.target.id === button.attr('id')) {
             return;
           }
 
           page.closeSubmenu(button, noTooltips);
-          $(document).unbind("click.submenu");
+          $(document).off("click.submenu");
         });
 
         // Hack to get spectrum color pickers to redraw
@@ -359,40 +359,40 @@ function listeners() {
     });
   });
 
-  $("#shapes-line").click(function() {
+  $("#shapes-line").on("click", function() {
     canvas.deactivateAllWithDispatch();
     canvas.renderAll();
     drawing.drawObj("line");
     canvas.defaultCursor = 'crosshair';
   });
 
-  $("#shapes-circle").click(function() {
+  $("#shapes-circle").on("click", function() {
     canvas.deactivateAllWithDispatch();
     canvas.renderAll();
     drawing.drawObj("circle");
     canvas.defaultCursor = 'crosshair';
   });
 
-  $("#shapes-rectangle").click(function() {
+  $("#shapes-rectangle").on("click", function() {
     canvas.deactivateAllWithDispatch();
     canvas.renderAll();
     drawing.drawObj("square");
     canvas.defaultCursor = 'crosshair';
   });
 
-  $("#shapes-rounded").click(function() {
+  $("#shapes-rounded").on("click", function() {
     canvas.deactivateAllWithDispatch();
     canvas.renderAll();
     drawing.drawObj("rounded-rect");
     canvas.defaultCursor = 'crosshair';
   });
 
-  $("#download-button").click(function() {
+  $("#download-button").on("click", function() {
     toggle($("#sidebar-export"));
     return false;
   });
 
-  $("#preview-button").click(function() {
+  $("#preview-button").on("click", function() {
     page.showPreview();
     hideActiveTools();
     return false;
@@ -400,7 +400,7 @@ function listeners() {
 
   // Export panel
 
-  $("#download-image-button").click(function() {
+  $("#download-image-button").on("click", function() {
     var type = $("input[name=file-type]:checked").val();
     var background = $("input[name=background-color]:checked").val();
 
@@ -437,7 +437,7 @@ function listeners() {
     }
   });
 
-  $("#export-file-button").click(function() {
+  $("#export-file-button").on("click", function() {
     // Broken in Safari
     var isSafari = navigator.vendor && navigator.vendor.indexOf('Apple') > -1 &&
                  navigator.userAgent && !navigator.userAgent.match('CriOS');
@@ -479,7 +479,7 @@ function listeners() {
 
   // Search panel
 
-  $("#artwork-search-form").submit(function(e) {
+  $("#artwork-search-form").on("submit", function(e) {
     // Prevent form submission
     e.preventDefault();
 
@@ -499,51 +499,51 @@ function listeners() {
       isClipart);
   });
 
-  $("#search-submit").click(function(){
-    $('form[name=artwork-search-form]').submit();
+  $("#search-submit").on("click", function(){
+    $('form[name=artwork-search-form]').trigger("submit");
   });
 
   // Search again if user changes search type
-  $('input[type=radio][name=search-type]').change(function() {
+  $('input[type=radio][name=search-type]').on("change", function() {
     if ($("#artwork-search").val() !== "") {
-      $('form[name=artwork-search-form]').submit();
+      $('form[name=artwork-search-form]').trigger("submit");
     }
   });
 
   /* ----- Active Selection Tools ------- */
 
-  $("#toolbar-bold").click(function() {
+  $("#toolbar-bold").on("click", function() {
     text.toggleBold();
     text.returnFocus();
   });
 
-  $("#toolbar-italics").click(function() {
+  $("#toolbar-italics").on("click", function() {
     text.toggleItalics();
     text.returnFocus();
   });
 
-  $("#toolbar-underline").click(function() {
+  $("#toolbar-underline").on("click", function() {
     text.toggleUnderline();
     text.returnFocus();
   });
 
-  $("#toolbar-send-back").click(function() {
+  $("#toolbar-send-back").on("click", function() {
     utils.sendToBack();
   });
 
-  $("#toolbar-send-backward").click(function() {
+  $("#toolbar-send-backward").on("click", function() {
     utils.sendBackward();
   });
 
-  $("#toolbar-bring-forward").click(function() {
+  $("#toolbar-bring-forward").on("click", function() {
     utils.sendForward();
   });
 
-  $("#toolbar-bring-front").click(function() {
+  $("#toolbar-bring-front").on("click", function() {
     utils.sendToFront();
   });
 
-  $("#shadow-switch").change(function() {
+  $("#shadow-switch").on("change", function() {
     if($(this).is(":checked")) {
       $("#glow-switch-label")[0].MaterialSwitch.off();
       $("#shadow-options").slideToggle(200);
@@ -563,7 +563,7 @@ function listeners() {
     }
   });
 
-  $("#glow-switch").change(function() {
+  $("#glow-switch").on("change", function() {
     if($(this).is(":checked")) {
       $("#shadow-switch-label")[0].MaterialSwitch.off();
       $("#glow-options").slideToggle(200);
@@ -583,15 +583,15 @@ function listeners() {
     }
   });
 
-  $("#shadow-blur-slider").change(function() {
+  $("#shadow-blur-slider").on("change", function() {
     setShadow();
   });
 
-  $("#shadow-offset-slider").change(function() {
+  $("#shadow-offset-slider").on("change", function() {
     setShadow();
   });
 
-  $("#glow-size-slider").change(function() {
+  $("#glow-size-slider").on("change", function() {
     setShadow();
   });
 }
@@ -602,8 +602,8 @@ function setCurrentShadowValues() {
     $("#shadow-switch-label")[0].MaterialSwitch.on();
     $("#glow-switch-label")[0].MaterialSwitch.off();
 
-    $("#shadow-offset-slider")[0].MaterialSlider.change(utils.getShadowOffset().x);
-    $("#shadow-blur-slider")[0].MaterialSlider.change(utils.getShadowBlur());
+    $("#shadow-offset-slider")[0].MaterialSlider.on("change", utils.getShadowOffset().x);
+    $("#shadow-blur-slider")[0].MaterialSlider.on("change", utils.getShadowBlur());
 
     shadowColor = utils.getShadowColor();
     $("#shadow-color-picker").spectrum("set", shadowColor);
@@ -615,7 +615,7 @@ function setCurrentShadowValues() {
     $("#shadow-switch-label")[0].MaterialSwitch.off();
     $("#glow-switch-label")[0].MaterialSwitch.on();
 
-    $("#glow-size-slider")[0].MaterialSlider.change(utils.getShadowBlur());
+    $("#glow-size-slider")[0].MaterialSlider.on("change", utils.getShadowBlur());
 
     shadowColor = utils.getShadowColor();
     $("#glow-color-hex").val(shadowColor);
@@ -765,7 +765,7 @@ function HandlersModule() {
       offsetX: 18,
       offsetY: 5,
       functionReady: function(){
-        $(document).click(function() {
+        $(document).on("click", function() {
           $("#sidebar-artwork > .inactive > img").tooltipster('hide');
         });
     }

@@ -18,7 +18,7 @@ function disableDraw() {
 
 function drawObj(objType) {
   // Esc key handler
-  $(document).keyup(escHandler);
+  $(document).on("keyup", escHandler);
 
   canvas.selection = false;
   canvas.forEachObject(function(o) {
@@ -27,7 +27,7 @@ function drawObj(objType) {
 
   canvas.on('mouse:down', function(o){
     // Unregister escape key handler
-    $(document).unbind("keyup", escHandler);
+    $(document).off("keyup", escHandler);
 
     isMouseDown = true;
     var pointer = canvas.getPointer(o.e);
@@ -154,7 +154,7 @@ function escHandler(e) {
     cancelInsert();
 
     // Unregister escape key handler
-    $(document).unbind("keyup", escHandler);
+    $(document).off("keyup", escHandler);
   }
 }
 

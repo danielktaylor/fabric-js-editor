@@ -7,7 +7,7 @@ function insertText() {
   canvas.defaultCursor = 'crosshair';
 
   // Esc key handler
-  $(document).keyup(escHandler);
+  $(document).on("keyup", escHandler);
 
   canvas.selection = false;
   canvas.forEachObject(function(o) {
@@ -16,7 +16,7 @@ function insertText() {
 
   canvas.on('mouse:down', function(o){
     // Unregister escape key handler
-    $(document).unbind("keyup", escHandler);
+    $(document).off("keyup", escHandler);
 
     drawing.disableDraw();
 
@@ -61,7 +61,7 @@ function escHandler(e) {
     cancelInsert();
 
     // Unregister escape key handler
-    $(document).unbind("keyup", escHandler);
+    $(document).off("keyup", escHandler);
   }
 }
 
