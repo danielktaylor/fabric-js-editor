@@ -55,31 +55,35 @@ function sendToBack() {
 }
 
 function clone() {
-	// clone what are you copying since you
-	// may want copy and paste on different moment.
-	// and you do not want the changes happened
-	// later to reflect on the copy.
-	canvas.getActiveObject().clone(function(cloned) {
-	  canvas.discardActiveObject();
-		cloned.set({
-			left: cloned.left + 10,
-			top: cloned.top + 10,
-			evented: true,
-		});
-		if (cloned.type === 'activeSelection') {
-			// active selection needs a reference to the canvas.
-			cloned.canvas = canvas;
-			cloned.forEachObject(function(obj) {
-				canvas.add(obj);
-			});
-			// this should solve the unselectability
-			cloned.setCoords();
-		} else {
-			canvas.add(cloned);
-		}
-		
-		canvas.setActiveObject(cloned);
-		canvas.requestRenderAll();	
+  // clone what are you copying since you
+  // may want copy and paste on different moment.
+  // and you do not want the changes happened
+  // later to reflect on the copy.
+  canvas.getActiveObject().clone(function(cloned) {
+    canvas.discardActiveObject();
+    cloned.set({
+      left: cloned.left + 10,
+      top: cloned.top + 10,
+      evented: true,
+    });
+    if (cloned.type === 'activeSelection') {
+      // active selection needs a reference to the canvas.
+      cloned.canvas = canvas;
+      cloned.forEachObject(function(obj) {
+        canvas.add(obj);
+        obj.perPixelTargetFind = true;
+        obj.targetFindTolerance = 4;
+      });
+      // this should solve the unselectability
+      cloned.setCoords();
+    } else {
+      canvas.add(cloned);
+      cloned.perPixelTargetFind = true;
+      cloned.targetFindTolerance = 4;
+    }
+
+    canvas.setActiveObject(cloned);
+    canvas.requestRenderAll();
   });
  
   // Push the canvas state to history
