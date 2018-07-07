@@ -9,161 +9,101 @@ Good references:
 var canvas = global.canvas;
 var filesaver = require('../lib/filesaver.min.js');
 
-function selectAll(objs) {
-  canvas.deactivateAll();
+function selectAll() {
 
-  if (objs === undefined) {
-    objs = canvas.getObjects();
-  }
+ canvas.discardActiveObject();
+        var sel = new fabric.ActiveSelection(canvas.getObjects(), {
+          canvas: canvas,
+        });
+        canvas.setActiveObject(sel);
+        canvas.requestRenderAll();
 
-  objs.map(function(o) {
-    return o.set('active', true);
-  });
-  var group = new fabric.Group(objs, {
-    originX: 'center',
-    originY: 'center'
-  });
-
-  canvas.setActiveGroup(group.setCoords());
 }
 
 function sendForward() {
-  if (canvas.getActiveGroup() !== null) {
-    sendGroupForward(canvas.getActiveGroup(), false);
-  } else if (canvas.getActiveObject() !== null) {
-    canvas.bringForward(canvas.getActiveObject());
-  }
-  // Push the canvas state to history
-  canvas.trigger("object:statechange");
+    var activeObject = canvas.getActiveObject();
+    if (activeObject) {
+      canvas.bringForward(activeObject);
+   // Push the canvas state to history
+    canvas.trigger("object:statechange");
+    }
 }
 
 function sendBackward() {
-  if (canvas.getActiveGroup() !== null) {
-    sendGroupBackward(canvas.getActiveGroup(), false);
-  } else if (canvas.getActiveObject() !== null) {
-    canvas.sendBackwards(canvas.getActiveObject());
-  }
-  // Push the canvas state to history
-  canvas.trigger("object:statechange");
+    var activeObject = canvas.getActiveObject();
+    if (activeObject) {
+      canvas.sendBackwards(activeObject);
+      // Push the canvas state to history
+      canvas.trigger("object:statechange");
+    }
 }
 
 function sendToFront() {
-  if (canvas.getActiveGroup() !== null) {
-    sendGroupForward(canvas.getActiveGroup(), true);
-  } else if (canvas.getActiveObject() !== null) {
-    canvas.bringToFront(canvas.getActiveObject());
-  }
-  // Push the canvas state to history
+     var activeObject = canvas.getActiveObject();
+    if (activeObject) {
+      canvas.bringToFront(activeObject);
+        // Push the canvas state to history
   canvas.trigger("object:statechange");
+    }
 }
 
 function sendToBack() {
-  if (canvas.getActiveGroup() !== null) {
-    sendGroupBackward(canvas.getActiveGroup(), true);
-  } else if (canvas.getActiveObject() !== null) {
-    canvas.sendToBack(canvas.getActiveObject());
-  }
-  // Push the canvas state to history
-  canvas.trigger("object:statechange");
+    var activeObject = canvas.getActiveObject();
+    if (activeObject) {
+      canvas.sendToBack(activeObject);
+      // Push the canvas state to history
+     canvas.trigger("object:statechange");
+    }
+
 }
 
 function clone() {
-  var object = null;
-  if (canvas.getActiveGroup() !== null) {
-    var objects = canvas.getActiveGroup().objects;
+    
+	// clone what are you copying since you
+	// may want copy and paste on different moment.
+	// and you do not want the changes happened
+	// later to reflect on the copy.
+	canvas.getActiveObject().clone(function(cloned) {
+	canvas.discardActiveObject();
+		cloned.set({
+			left: cloned.left + 10,
+			top: cloned.top + 10,
+			evented: true,
+		});
+		if (cloned.type === 'activeSelection') {
+			// active selection needs a reference to the canvas.
+			cloned.canvas = canvas;
+			cloned.forEachObject(function(obj) {
+				canvas.add(obj);
+			});
+			// this should solve the unselectability
+			cloned.setCoords();
+		} else {
+			canvas.add(cloned);
+		}
+		
+		canvas.setActiveObject(cloned);
+		canvas.requestRenderAll();	
+            });
 
-    // Fabric.js bug getting an object's coordinates when a group is selected
-    canvas.deactivateAll();
 
-    var cloned = [];
-    for (var i = 0; i < objects.length; i++) {
-      object = objects[i].clone();
-      object.set("top", object.top + 20);
-      object.set("left", object.left + 20);
-      canvas.add(object);
-      cloned.push(object);
-    }
-
-    selectAll(cloned);
-  } else if (canvas.getActiveObject() !== null) {
-    object = canvas.getActiveObject().clone();
-    object.set("top", object.top + 20);
-    object.set("left", object.left + 20);
-    canvas.add(object);
-
-    // select new object
-    canvas.deactivateAll();
-    canvas.setActiveObject(object);
-  }
-
-  canvas.renderAll();
-
+ 
   // Push the canvas state to history
   canvas.trigger("object:statechange");
 }
 
-// TODO Fabric.js might do this for us now that we've on version >1.5
-function sendGroupBackward(group, bottom) {
-  // Copy object references
-  var sorted = group.objects.slice();
 
-  // Sort the array
-  var objects = canvas.getObjects();
-  sorted.sort(function(a, b){
-    var z1 = objects.indexOf(a);
-    var z2 = objects.indexOf(b);
-    return a-b;
-  });
 
-  // Change layer of objects one-by-one
-  var obj;
-  if (bottom === true) {
-    for (var i = 0; i < sorted.length; i++) {
-      obj = sorted[i];
-      canvas.sendToBack(obj);
-    }
-  } else {
-    for (var j = sorted.length - 1; j >= 0; j--) {
-      obj = sorted[j];
-      canvas.sendBackwards(obj);
-    }
-  }
-}
 
-// TODO Fabric.js might do this for us now that we've on version >1.5
-function sendGroupForward(group, top) {
-  // Copy object references
-  var sorted = group.objects.slice();
 
-  // Sort the array
-  var objects = canvas.getObjects();
-  sorted.sort(function(a, b){
-    var z1 = objects.indexOf(a);
-    var z2 = objects.indexOf(b);
-    return a-b;
-  });
-
-  // Change layer of objects one-by-one
-  var obj;
-  if (top === true) {
-    for (var i = sorted.length - 1; i >= 0; i--) {
-      obj = sorted[i];
-      canvas.bringToFront(obj);
-    }
-  } else {
-    for (var j = 0; j < sorted.length; j++) {
-      obj = sorted[j];
-      canvas.bringForward(obj);
-    }
-  }
-}
+// TODO Fabric.js might do this for us now that we've on version >2.3.3
 
 // This is the shadow-less version
 /*
 function getImageBounds() {
   selectAll();
-  var rect = canvas.getActiveGroup().getBoundingRect();
-  canvas.deactivateAll();
+  var rect = canvas.getActiveObjects().getBoundingRect();
+  canvas.discardActiveObject() ;
   canvas.renderAll();
   return rect;
 }
@@ -180,7 +120,7 @@ function getImageBounds(fitToCanvas) {
   }
 
   // Fabric.js bug getting an objects bounds when all objects are selected
-  canvas.deactivateAll();
+  canvas.discardActiveObject() ;
   var bounds = objs[0].getBoundingRect();
 
   // Find maximum bounds
@@ -233,7 +173,7 @@ function getImageBounds(fitToCanvas) {
 
   // Don't show selection tools
   selectAll();
-  canvas.deactivateAll();
+  canvas.discardActiveObject() ;
   canvas.renderAll();
 
   return bounds;
@@ -242,9 +182,9 @@ function getImageBounds(fitToCanvas) {
 // includes shadows
 function getObjBounds(obj) {
   var bounds = obj.getBoundingRect();
-  var shadow = obj.getShadow();
+  var shadow = obj.Shadow;
 
-  if (shadow !== null) {
+  if (shadow != null) {
     var blur = shadow.blur;
     var mBlur = blur * Math.abs(obj.scaleX + obj.scaleY) / 4;
     var signX = shadow.offsetX >= 0.0 ? 1.0 : -1.0;
@@ -318,18 +258,19 @@ function exportFile(fileType) {
 }
 
 function deleteSelected() {
-  // Delete the current object(s)
-  if(canvas.getActiveGroup() !== null && canvas.getActiveGroup() !== undefined){
-    canvas.getActiveGroup().forEachObject(function(o){ canvas.remove(o); });
-    canvas.discardActiveGroup().renderAll();
-  } else if (canvas.getActiveObject() !== null && canvas.getActiveObject() !== undefined) {
-    canvas.remove(canvas.getActiveObject());
-  }
+      // Delete the current object(s)
+    var activeObjects = canvas.getActiveObjects();
+    canvas.discardActiveObject() ;
+    if (activeObjects.length) {
+      canvas.remove.apply(canvas, activeObjects);
+    }
+
 }
 
 function insertSvg(url, loader) {
   loader.removeClass("noshow");
   fabric.loadSVGFromURL(url, function(objects, options) {
+            console.log(url);
     var obj = fabric.util.groupSVGElements(objects, options);
 
     var scaleFactor = 1;
@@ -349,7 +290,7 @@ function insertSvg(url, loader) {
     canvas.add(obj);
     obj.perPixelTargetFind = true;
     obj.targetFindTolerance = 4;
-    canvas.deactivateAll();
+    canvas.discardActiveObject() ;
     canvas.setActiveObject(obj);
     canvas.renderAll();
 
@@ -367,27 +308,11 @@ function getActiveStyle(styleName, object) {
     return '';
   }
 
-  // Don't change part of text
-  /*
-  return (object.getSelectionStyles && object.isEditing) ? (object.getSelectionStyles()[styleName] || '') : (object[styleName] || '');
-  */
-
   return (object[styleName] || '');
 }
 
 function setActiveStyle(styleName, value, object) {
   object = object || canvas.getActiveObject();
-
-  // Don't change part of text
-  /*
-  if (object.setSelectionStyles && object.isEditing) {
-    var style = { };
-    style[styleName] = value;
-    object.setSelectionStyles(style);
-  } else {
-    object[styleName] = value;
-  }
-  */
   object[styleName] = value;
 }
 
@@ -401,26 +326,49 @@ function getFillColor() {
     return getActiveStyle("fill");
   }
 }
+function setActiveStyle(styleName, value, object) {
+  object = object || canvas.getActiveObject();
+  if (!object) return;
+
+  if (object.setSelectionStyles && object.isEditing) {
+    var style = { };
+    style[styleName] = value;
+    object.setSelectionStyles(style);
+    object.setCoords();
+  }
+  else {
+    object.set(styleName, value);
+  }
+
+  object.setCoords();
+  canvas.renderAll();
+};
+
 
 function setFillColor(hex) {
-  var object = canvas.getActiveObject();
+      var object = canvas.getActiveObject();
   if (object) {
-    if (object.type === 'i-text') {
-      setActiveStyle('fill', hex);
-    } else if (object.type === 'line') {
-      setActiveStyle('stroke', hex);
-    } else {
-      if (!object.paths) {
-        object.setFill(hex);
-      } else if (object.paths) {
-        for (var i = 0; i < object.paths.length; i++) {
-          object.paths[i].setFill(hex);
-        }
-      }
+    setActiveStyle('fill',hex);  // transparency
     }
-
-    object.customFillColor = hex;
-  }
+//  if (object) {
+//    if (object.type === 'i-text') {
+//      setActiveStyle('fill', hex);
+//    } else if (object.type === 'line') {
+//      setActiveStyle('stroke', hex);
+//    } else {
+//      if (!object.paths) {
+//             object.setActiveStyle('fill', hex);
+//
+////        object.Fill=hex;
+//      } else if (object.paths) {
+//        for (var i = 0; i < object.paths.length; i++) {
+//          object.paths[i].setFill(hex);
+//        }
+//      }
+//    }
+//
+//    object.customFillColor = hex;
+//  }
 }
 
 function getOutlineColor() {
@@ -435,19 +383,22 @@ function getOutlineColor() {
 function setOutlineColor(hex) {
   var object = canvas.getActiveObject();
   if (object) {
-    if (object.type === 'i-text' || object.type === 'line') {
-      setActiveStyle('stroke', hex);
-    } else {
-      if (!object.paths) {
-        object.setStroke(hex);
-      } else if (object.paths) {
-        for (var i = 0; i < object.paths.length; i++) {
-          object.paths[i].setStroke(hex);
-        }
-      }
-    }
+      
+          setActiveStyle('stroke',hex);
 
-    object.customOutlineColor = hex;
+//    if (object.type === 'i-text' || object.type === 'line') {
+//      setActiveStyle('stroke', hex);
+//    } else {
+//      if (!object.paths) {
+//        object.setStroke(hex);
+//      } else if (object.paths) {
+//        for (var i = 0; i < object.paths.length; i++) {
+//          object.paths[i].setStroke(hex);
+//        }
+//      }
+//    }
+//
+//    object.customOutlineColor = hex;
   }
 }
 
@@ -489,7 +440,7 @@ function setShadow(_color, _blur, _offsetX, _offsetY, object) {
 
 function changeShadowColor(color, object) {
   object = object || canvas.getActiveObject();
-  var shadow = object.getShadow();
+  var shadow = object.shadow;
   if (shadow === null) {
     return null;
   }
@@ -507,20 +458,20 @@ function clearShadow(object) {
 
 function isShadow(object) {
   object = object || canvas.getActiveObject();
-  var shadow = object.getShadow();
+  var shadow = object.shadow ;
   return (shadow !== null && (shadow.offsetX !== 0 || shadow.offsetY !== 0));
 }
 
 // Glow is just a shadow with an offset of zero
 function isGlow(object) {
   object = object || canvas.getActiveObject();
-  var shadow = object.getShadow();
+  var shadow = object.shadow;
   return (shadow !== null && shadow.offsetX === 0 && shadow.offsetY === 0);
 }
 
 function getShadowBlur(object) {
   object = object || canvas.getActiveObject();
-  var shadow = object.getShadow();
+  var shadow = object.shadow;
   if (shadow === null) {
     return null;
   }
@@ -530,7 +481,7 @@ function getShadowBlur(object) {
 
 function getShadowColor(object) {
   object = object || canvas.getActiveObject();
-  var shadow = object.getShadow();
+  var shadow = object.shadow;
   if (shadow === null) {
     return null;
   }
@@ -540,11 +491,10 @@ function getShadowColor(object) {
 
 function getShadowOffset(object) {
   object = object || canvas.getActiveObject();
-  var shadow = object.getShadow();
-  if (shadow === null) {
+  var shadow = object.shadow;
+  if (shadow == null) {
     return null;
   }
-
   var x = parseInt(shadow.offsetX);
   var y = parseInt(shadow.offsetY);
   return {"x": x, "y": y};
@@ -571,8 +521,8 @@ function centerContent() {
   changeImageOffset(diffLeft, diffTop);
 
   // Work around bug where you can't select objects after they have been added
-  selectAll();
-  canvas.deactivateAll();
+//  selectAll();
+//  canvas.discardActiveObject() ;
 
   canvas.renderAll();
 }
@@ -586,8 +536,6 @@ function UtilsModule() {
 }
 
 UtilsModule.prototype.selectAll = selectAll;
-UtilsModule.prototype.sendGroupBackward = sendGroupBackward;
-UtilsModule.prototype.sendGroupForward = sendGroupForward;
 UtilsModule.prototype.exportFile = exportFile;
 UtilsModule.prototype.getImageBounds = getImageBounds;
 UtilsModule.prototype.deleteSelected = deleteSelected;

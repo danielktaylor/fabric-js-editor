@@ -79,18 +79,9 @@ function returnFocus() {
 
 // Set object style
 function setStyle(object, styleName, value) {
-  // Don't allow changing part of the text
-  /*
-  if (object.setSelectionStyles && object.isEditing) {
-    var style = { };
-    style[styleName] = value;
-    object.setSelectionStyles(style);
-  } else {
-    object[styleName] = value;
-  }
-  */
-
+  object = object || canvas.getActiveObject();
   object[styleName] = value;
+  object.set({dirty: true});
 }
 
 // Get object style
@@ -103,7 +94,7 @@ function getStyle(object, styleName) {
     return object[styleName];
   }
   */
-
+  object = object || canvas.getActiveObject();
   return object[styleName];
 }
 
@@ -150,14 +141,16 @@ function toggleBold() {
 }
 
 function isUnderline(obj) {
-  return (getStyle(obj, 'textDecoration') || '').indexOf('underline') > -1;
+  return (getStyle(obj, 'underline') || '');   // updated to udenrline in fabricjs 2.3.3
 }
 
 function toggleUnderline() {
   var button = $("#toolbar-underline");
   var obj = canvas.getActiveObject();
   var underlined = !isUnderline(obj);
-  setStyle(obj, 'textDecoration', underlined ? 'underline' : '');
+  // in fabricjs 2.3.3 no textDecoration any more it's done via underline (true|false)
+    setStyle(obj, 'underline',underlined);
+
 
   if (underlined) {
     button.addClass("toolbar-item-active");

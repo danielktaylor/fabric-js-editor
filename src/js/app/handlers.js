@@ -80,7 +80,7 @@ function rightClick() {
 
   // Bind right-click menu
   $('#content').on('contextmenu.custom', function (e) {
-    var target = canvas.findTarget(e.e);
+    var target = canvas.findTarget(e);
     if (target !== null && target !== undefined) {
       canvas.setActiveObject(target);
       return true;
@@ -131,16 +131,23 @@ function showActiveTools() {
 
   var tools = $("#active-tools");
   var obj = canvas.getActiveObject();
-
-  if (canvas.getActiveGroup() !== null && canvas.getActiveGroup() !== undefined) {
+  
+  
+  if (obj){
+      
+  if (canvas.getActiveObjects().length>1) {
     $("#active-tools > div").addClass("noshow");
     tools.removeClass("noshow");
     $("div.group", tools).removeClass("noshow");
-  } else if (obj !== null && obj !== undefined) {
+    
+  } 
+     else if (obj !== null && obj !== undefined) {
+
     $("#active-tools > div").addClass("noshow");
     tools.removeClass("noshow");
 
     var type = canvas.getActiveObject().type;
+    
     if (type === "i-text") {
       $("div.text", tools).removeClass("noshow");
 
@@ -196,7 +203,9 @@ function showActiveTools() {
     page.glowColorPicker();
     page.shadowColorPicker();
 
-  } else {
+  }
+  }
+    else {
     hideActiveTools();
   }
 }
@@ -267,7 +276,11 @@ function listeners() {
 
   // Set event listeners
   canvas.on({
-    "object:selected": function() {
+      
+    "selection:updated": function() {
+      showActiveTools();
+    },
+    "selection:created": function() {
       showActiveTools();
     },
     "selection:cleared": function() {
@@ -360,28 +373,29 @@ function listeners() {
   });
 
   $("#shapes-line").on("click", function() {
-    canvas.deactivateAllWithDispatch();
-    canvas.renderAll();
+
+      canvas.discardActiveObject() ;
+      canvas.requestRenderAll() ;
     drawing.drawObj("line");
     canvas.defaultCursor = 'crosshair';
   });
 
   $("#shapes-circle").on("click", function() {
-    canvas.deactivateAllWithDispatch();
+    canvas.discardActiveObject();
     canvas.renderAll();
     drawing.drawObj("circle");
     canvas.defaultCursor = 'crosshair';
   });
 
   $("#shapes-rectangle").on("click", function() {
-    canvas.deactivateAllWithDispatch();
+    canvas.discardActiveObject();
     canvas.renderAll();
     drawing.drawObj("square");
     canvas.defaultCursor = 'crosshair';
   });
 
   $("#shapes-rounded").on("click", function() {
-    canvas.deactivateAllWithDispatch();
+    canvas.discardActiveObject();
     canvas.renderAll();
     drawing.drawObj("rounded-rect");
     canvas.defaultCursor = 'crosshair';
@@ -602,7 +616,7 @@ function setCurrentShadowValues() {
     $("#shadow-switch-label")[0].MaterialSwitch.on();
     $("#glow-switch-label")[0].MaterialSwitch.off();
 
-    $("#shadow-offset-slider")[0].MaterialSlider.on("change", utils.getShadowOffset().x);
+    $("#shadow-offset-slider")[0].MaterialSlider.on("change", utils.getShadowOffset().x);    
     $("#shadow-blur-slider")[0].MaterialSlider.on("change", utils.getShadowBlur());
 
     shadowColor = utils.getShadowColor();

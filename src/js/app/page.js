@@ -51,7 +51,7 @@ function arrowKeys() {
     }
 
     var activeObject = canvas.getActiveObject();
-    var activeGroup = canvas.getActiveGroup();
+    var activeGroup = canvas.getActiveObjects();
 
     var a;
     if (evt.keyCode === 37) {

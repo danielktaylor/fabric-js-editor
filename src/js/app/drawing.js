@@ -120,9 +120,11 @@ function drawObj(objType) {
       canvas.defaultCursor = 'auto';
 
       // Fix selection bug by selecting and deselecting all objects
-      utils.selectAll();
-      canvas.deactivateAll();
-
+    
+    
+    utils.selectAll();
+    canvas.discardActiveObject();
+    
       // Select the object
       canvas.setActiveObject(drawnObj).renderAll();
 
@@ -145,7 +147,7 @@ function drawObj(objType) {
 function cancelInsert() {
   canvas.defaultCursor = 'auto';
   disableDraw();
-  $("#toolbar-text").removeClass("toolbar-item-active ");
+  $("#toolbar-text").removeClass("toolbar-item-active");
 }
 
 // Cancel text insertion
