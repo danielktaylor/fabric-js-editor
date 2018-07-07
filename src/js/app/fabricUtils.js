@@ -257,7 +257,6 @@ function deleteSelected() {
 function insertSvg(url, loader) {
   loader.removeClass("noshow");
   fabric.loadSVGFromURL(url, function(objects, options) {
-            console.log(url);
     var obj = fabric.util.groupSVGElements(objects, options);
 
     var scaleFactor = 1;
@@ -329,8 +328,7 @@ function setActiveStyle(styleName, value, object) {
 
   object.setCoords();
   canvas.renderAll();
-};
-
+}
 
 function setFillColor(hex) {
   var object = canvas.getActiveObject();
