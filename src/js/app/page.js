@@ -51,7 +51,6 @@ function arrowKeys() {
     }
 
     var activeObject = canvas.getActiveObject();
-    var activeGroup = canvas.getActiveObjects();
 
     var a;
     if (evt.keyCode === 37) {
@@ -59,47 +58,29 @@ function arrowKeys() {
       if (activeObject) {
         a = activeObject.get('left') - movementDelta;
         activeObject.set('left', a);
-      } else if (activeGroup) {
-        a = activeGroup.get('left') - movementDelta;
-        activeGroup.set('left', a);
       }
-
     } else if (evt.keyCode === 39) {
       evt.preventDefault(); // Prevent the default action
       if (activeObject) {
         a = activeObject.get('left') + movementDelta;
         activeObject.set('left', a);
-      } else if (activeGroup) {
-        a = activeGroup.get('left') + movementDelta;
-        activeGroup.set('left', a);
       }
-
     } else if (evt.keyCode === 38) {
       evt.preventDefault(); // Prevent the default action
       if (activeObject) {
         a = activeObject.get('top') - movementDelta;
         activeObject.set('top', a);
-      } else if (activeGroup) {
-        a = activeGroup.get('top') - movementDelta;
-        activeGroup.set('top', a);
       }
-
     } else if (evt.keyCode === 40) {
       evt.preventDefault(); // Prevent the default action
       if (activeObject) {
         a = activeObject.get('top') + movementDelta;
         activeObject.set('top', a);
-      } else if (activeGroup) {
-        a = activeGroup.get('top') + movementDelta;
-        activeGroup.set('top', a);
       }
     }
 
     if (activeObject) {
       activeObject.setCoords();
-      canvas.renderAll();
-    } else if (activeGroup) {
-      activeGroup.setCoords();
       canvas.renderAll();
     }
   });
