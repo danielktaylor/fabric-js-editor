@@ -141,16 +141,14 @@ function toggleBold() {
 }
 
 function isUnderline(obj) {
-  return (getStyle(obj, 'underline') || '');   // updated to udenrline in fabricjs 2.3.3
+  return (getStyle(obj, 'underline') || '');
 }
 
 function toggleUnderline() {
   var button = $("#toolbar-underline");
   var obj = canvas.getActiveObject();
   var underlined = !isUnderline(obj);
-  // in fabricjs 2.3.3 no textDecoration any more it's done via underline (true|false)
-    setStyle(obj, 'underline',underlined);
-
+  setStyle(obj, 'underline',underlined);
 
   if (underlined) {
     button.addClass("toolbar-item-active");

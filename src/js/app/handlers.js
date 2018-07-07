@@ -132,80 +132,75 @@ function showActiveTools() {
   var tools = $("#active-tools");
   var obj = canvas.getActiveObject();
   
-  
-  if (obj){
+  if (obj){      
+    if (canvas.getActiveObjects().length>1) {
+      $("#active-tools > div").addClass("noshow");
+      tools.removeClass("noshow");
+      $("div.group", tools).removeClass("noshow");
       
-  if (canvas.getActiveObjects().length>1) {
-    $("#active-tools > div").addClass("noshow");
-    tools.removeClass("noshow");
-    $("div.group", tools).removeClass("noshow");
-    
-  } 
-     else if (obj !== null && obj !== undefined) {
+    } else if (obj !== null && obj !== undefined) {
+      $("#active-tools > div").addClass("noshow");
+      tools.removeClass("noshow");
 
-    $("#active-tools > div").addClass("noshow");
-    tools.removeClass("noshow");
+      var type = canvas.getActiveObject().type;
+      
+      if (type === "i-text") {
+        $("div.text", tools).removeClass("noshow");
 
-    var type = canvas.getActiveObject().type;
-    
-    if (type === "i-text") {
-      $("div.text", tools).removeClass("noshow");
+        if (text.isBold(obj)) {
+          $("#toolbar-bold").addClass("toolbar-item-active");
+        } else {
+          $("#toolbar-bold").removeClass("toolbar-item-active");
+        }
 
-      if (text.isBold(obj)) {
-        $("#toolbar-bold").addClass("toolbar-item-active");
+        if (text.isItalics(obj)) {
+          $("#toolbar-italics").addClass("toolbar-item-active");
+        } else {
+          $("#toolbar-italics").removeClass("toolbar-item-active");
+        }
+
+        if (text.isUnderline(obj)) {
+          $("#toolbar-underline").addClass("toolbar-item-active");
+        } else {
+          $("#toolbar-underline").removeClass("toolbar-item-active");
+        }
+
+        /*
+        $("#font-size").val(utils.getFontSize());
+        $("#font-size").on("change", function(value) {
+          utils.setFontSize($("#font-size").val());
+        });
+        */
+
+        showCurrentFont();
+
+      } else if (type === "svg") {
+        $("div.svg", tools).removeClass("noshow");
       } else {
-        $("#toolbar-bold").removeClass("toolbar-item-active");
+        $("div.shape", tools).removeClass("noshow");
       }
 
-      if (text.isItalics(obj)) {
-        $("#toolbar-italics").addClass("toolbar-item-active");
-      } else {
-        $("#toolbar-italics").removeClass("toolbar-item-active");
+      // Init fill color picker
+      page.fillColorPicker();
+      var color = utils.getFillColor();
+      if (color && color !== "") {
+        $("#toolbar-fill-color").spectrum("set", color);
       }
 
-      if (text.isUnderline(obj)) {
-        $("#toolbar-underline").addClass("toolbar-item-active");
-      } else {
-        $("#toolbar-underline").removeClass("toolbar-item-active");
+      // Init outline color picker
+      page.outlineColorPicker();
+      var outlineColor = utils.getOutlineColor();
+      if (outlineColor && outlineColor !== "") {
+        $("#toolbar-outline-color").spectrum("set", outlineColor);
       }
 
-      /*
-      $("#font-size").val(utils.getFontSize());
-      $("#font-size").on("change", function(value) {
-        utils.setFontSize($("#font-size").val());
-      });
-      */
+      // Shadow and glow
+      setCurrentShadowValues();
+      page.glowColorPicker();
+      page.shadowColorPicker();
 
-      showCurrentFont();
-
-    } else if (type === "svg") {
-      $("div.svg", tools).removeClass("noshow");
-    } else {
-      $("div.shape", tools).removeClass("noshow");
     }
-
-    // Init fill color picker
-    page.fillColorPicker();
-    var color = utils.getFillColor();
-    if (color && color !== "") {
-      $("#toolbar-fill-color").spectrum("set", color);
-    }
-
-    // Init outline color picker
-    page.outlineColorPicker();
-    var outlineColor = utils.getOutlineColor();
-    if (outlineColor && outlineColor !== "") {
-      $("#toolbar-outline-color").spectrum("set", outlineColor);
-    }
-
-    // Shadow and glow
-    setCurrentShadowValues();
-    page.glowColorPicker();
-    page.shadowColorPicker();
-
-  }
-  }
-    else {
+  } else {
     hideActiveTools();
   }
 }

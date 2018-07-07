@@ -10,61 +10,57 @@ var canvas = global.canvas;
 var filesaver = require('../lib/filesaver.min.js');
 
 function selectAll() {
-
- canvas.discardActiveObject();
-        var sel = new fabric.ActiveSelection(canvas.getObjects(), {
-          canvas: canvas,
-        });
-        canvas.setActiveObject(sel);
-        canvas.requestRenderAll();
-
+  canvas.discardActiveObject();
+  var sel = new fabric.ActiveSelection(canvas.getObjects(), {
+    canvas: canvas,
+  });
+  canvas.setActiveObject(sel);
+  canvas.requestRenderAll();
 }
 
 function sendForward() {
-    var activeObject = canvas.getActiveObject();
-    if (activeObject) {
-      canvas.bringForward(activeObject);
-   // Push the canvas state to history
+  var activeObject = canvas.getActiveObject();
+  if (activeObject) {
+    canvas.bringForward(activeObject);
+    // Push the canvas state to history
     canvas.trigger("object:statechange");
-    }
+  }
 }
 
 function sendBackward() {
-    var activeObject = canvas.getActiveObject();
-    if (activeObject) {
-      canvas.sendBackwards(activeObject);
-      // Push the canvas state to history
-      canvas.trigger("object:statechange");
-    }
+  var activeObject = canvas.getActiveObject();
+  if (activeObject) {
+    canvas.sendBackwards(activeObject);
+    // Push the canvas state to history
+    canvas.trigger("object:statechange");
+  }
 }
 
 function sendToFront() {
-     var activeObject = canvas.getActiveObject();
-    if (activeObject) {
-      canvas.bringToFront(activeObject);
-        // Push the canvas state to history
-  canvas.trigger("object:statechange");
-    }
+  var activeObject = canvas.getActiveObject();
+  if (activeObject) {
+    canvas.bringToFront(activeObject);
+    // Push the canvas state to history
+    canvas.trigger("object:statechange");
+  }
 }
 
 function sendToBack() {
-    var activeObject = canvas.getActiveObject();
-    if (activeObject) {
-      canvas.sendToBack(activeObject);
-      // Push the canvas state to history
-     canvas.trigger("object:statechange");
-    }
-
+  var activeObject = canvas.getActiveObject();
+  if (activeObject) {
+    canvas.sendToBack(activeObject);
+    // Push the canvas state to history
+    canvas.trigger("object:statechange");
+  }
 }
 
 function clone() {
-    
 	// clone what are you copying since you
 	// may want copy and paste on different moment.
 	// and you do not want the changes happened
 	// later to reflect on the copy.
 	canvas.getActiveObject().clone(function(cloned) {
-	canvas.discardActiveObject();
+	  canvas.discardActiveObject();
 		cloned.set({
 			left: cloned.left + 10,
 			top: cloned.top + 10,
@@ -84,19 +80,11 @@ function clone() {
 		
 		canvas.setActiveObject(cloned);
 		canvas.requestRenderAll();	
-            });
-
-
+  });
  
   // Push the canvas state to history
   canvas.trigger("object:statechange");
 }
-
-
-
-
-
-// TODO Fabric.js might do this for us now that we've on version >2.3.3
 
 // This is the shadow-less version
 /*
@@ -258,13 +246,12 @@ function exportFile(fileType) {
 }
 
 function deleteSelected() {
-      // Delete the current object(s)
-    var activeObjects = canvas.getActiveObjects();
-    canvas.discardActiveObject() ;
-    if (activeObjects.length) {
-      canvas.remove.apply(canvas, activeObjects);
-    }
-
+  // Delete the current object(s)
+  var activeObjects = canvas.getActiveObjects();
+  canvas.discardActiveObject() ;
+  if (activeObjects.length) {
+    canvas.remove.apply(canvas, activeObjects);
+  }
 }
 
 function insertSvg(url, loader) {
@@ -346,29 +333,10 @@ function setActiveStyle(styleName, value, object) {
 
 
 function setFillColor(hex) {
-      var object = canvas.getActiveObject();
+  var object = canvas.getActiveObject();
   if (object) {
     setActiveStyle('fill',hex);  // transparency
-    }
-//  if (object) {
-//    if (object.type === 'i-text') {
-//      setActiveStyle('fill', hex);
-//    } else if (object.type === 'line') {
-//      setActiveStyle('stroke', hex);
-//    } else {
-//      if (!object.paths) {
-//             object.setActiveStyle('fill', hex);
-//
-////        object.Fill=hex;
-//      } else if (object.paths) {
-//        for (var i = 0; i < object.paths.length; i++) {
-//          object.paths[i].setFill(hex);
-//        }
-//      }
-//    }
-//
-//    object.customFillColor = hex;
-//  }
+  }
 }
 
 function getOutlineColor() {
@@ -383,22 +351,7 @@ function getOutlineColor() {
 function setOutlineColor(hex) {
   var object = canvas.getActiveObject();
   if (object) {
-      
-          setActiveStyle('stroke',hex);
-
-//    if (object.type === 'i-text' || object.type === 'line') {
-//      setActiveStyle('stroke', hex);
-//    } else {
-//      if (!object.paths) {
-//        object.setStroke(hex);
-//      } else if (object.paths) {
-//        for (var i = 0; i < object.paths.length; i++) {
-//          object.paths[i].setStroke(hex);
-//        }
-//      }
-//    }
-//
-//    object.customOutlineColor = hex;
+    setActiveStyle('stroke',hex);
   }
 }
 
@@ -519,11 +472,6 @@ function centerContent() {
   var diffTop = canvasMidpointTop - imageMidpointTop;
 
   changeImageOffset(diffLeft, diffTop);
-
-  // Work around bug where you can't select objects after they have been added
-//  selectAll();
-//  canvas.discardActiveObject() ;
-
   canvas.renderAll();
 }
 
